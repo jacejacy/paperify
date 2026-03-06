@@ -115,10 +115,78 @@ export default function Home() {
   const activePreset = getPreset(state.activePreset);
 
   return (
-  <div className="flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden bg-white">
-    {/* Controls */}
-    <aside className="w-full md:w-[360px] border-b md:border-b-0 md:border-r">
-      <div className="max-h-[45dvh] md:max-h-none overflow-auto">
+  <div className="flex flex-col md:flex-row min-h-[100dvh] w-screen bg-white md:h-[100dvh] md:overflow-hidden">
+    {/* Preview (sticky on mobile, normal on desktop) */}
+    <main className="order-1 md:order-2 w-full md:flex-1">
+      <div className="sticky top-0 z-10 bg-white md:static">
+        <div className="h-[60dvh] md:h-full relative">
+          {state.uploadedImage ? (
+            hasWebGL ? (
+              state.activePreset === 'magazine' ? (
+                <Magazine2D
+                  preset={activePreset}
+                  uploadedImage={state.uploadedImage}
+                  imageAspectRatio={state.imageAspectRatio}
+                  printStrength={state.printStrength}
+                  glossStrength={state.magazineGlossStrength}
+                  canvasRef={canvasRef}
+                />
+              ) : (
+                <Scene
+                  preset={activePreset}
+                  uploadedImage={state.uploadedImage}
+                  imageAspectRatio={state.imageAspectRatio}
+                  paperAge={state.paperAge}
+                  wrinkles={state.wrinkles}
+                  paperColor={state.paperColor}
+                  printStrength={state.printStrength}
+                  grain={state.grain}
+                  mosaicFading={state.mosaicFading}
+                  viewMode={state.viewMode}
+                  canvasRef={canvasRef}
+                />
+              )
+            ) : (
+              <Fallback2D
+                preset={activePreset}
+                uploadedImage={state.uploadedImage}
+                paperAge={state.paperAge}
+                paperColor={state.paperColor}
+                printStrength={state.printStrength}
+                grain={state.grain}
+                mosaicFading={state.mosaicFading}
+              />
+            )
+          ) : (
+            <div className="flex items-center justify-center h-full bg-white">
+              <div className="text-center max-w-md px-8">
+                <h2 className="text-xl font-medium text-gray-900 mb-2">
+                  Upload a photo to get started
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Transform any image into a realistic paper print with customizable aging,
+                  wrinkles, and paper types.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Watermark: desktop only (mobile hides to avoid blocking the image) */}
+          <div className="hidden md:block absolute bottom-14 right-8 z-50 rounded bg-white/85 px-2 py-1 text-sm text-gray-500 shadow-sm pointer-events-none">
+            Made by: Jace Lin @jacelnn
+          </div>
+        </div>
+      </div>
+    </main>
+
+    {/* Controls (scroll below the sticky preview on mobile; left panel on desktop) */}
+    <aside className="order-2 md:order-1 w-full md:w-[360px] border-t md:border-t-0 md:border-r">
+      {/* Mobile credit line (so it doesn't cover the preview) */}
+      <div className="md:hidden px-5 pt-4 text-sm text-gray-500">
+        Made by: Jace Lin @jacelnn
+      </div>
+
+      <div className="md:h-full md:overflow-auto">
         <ControlPanel
           state={state}
           onUpload={handleUpload}
@@ -126,9 +194,7 @@ export default function Home() {
           onPaperAgeChange={(val) => setState((prev) => ({ ...prev, paperAge: val }))}
           onWrinklesChange={(val) => setState((prev) => ({ ...prev, wrinkles: val }))}
           onPaperColorChange={(val) => setState((prev) => ({ ...prev, paperColor: val }))}
-          onPrintStrengthChange={(val) =>
-            setState((prev) => ({ ...prev, printStrength: val }))
-          }
+          onPrintStrengthChange={(val) => setState((prev) => ({ ...prev, printStrength: val }))}
           onGrainChange={(val) => setState((prev) => ({ ...prev, grain: val }))}
           onMosaicFadeChange={(val) => setState((prev) => ({ ...prev, mosaicFading: val }))}
           onGlossStrengthChange={(val) =>
@@ -140,66 +206,6 @@ export default function Home() {
         />
       </div>
     </aside>
-
-    {/* Preview */}
-    <main className="flex-1 min-h-0">
-      <div className="h-[55dvh] md:h-full relative">
-        {state.uploadedImage ? (
-          hasWebGL ? (
-            state.activePreset === 'magazine' ? (
-              <Magazine2D
-                preset={activePreset}
-                uploadedImage={state.uploadedImage}
-                imageAspectRatio={state.imageAspectRatio}
-                printStrength={state.printStrength}
-                glossStrength={state.magazineGlossStrength}
-                canvasRef={canvasRef}
-              />
-            ) : (
-              <Scene
-                preset={activePreset}
-                uploadedImage={state.uploadedImage}
-                imageAspectRatio={state.imageAspectRatio}
-                paperAge={state.paperAge}
-                wrinkles={state.wrinkles}
-                paperColor={state.paperColor}
-                printStrength={state.printStrength}
-                grain={state.grain}
-                mosaicFading={state.mosaicFading}
-                viewMode={state.viewMode}
-                canvasRef={canvasRef}
-              />
-            )
-          ) : (
-            <Fallback2D
-              preset={activePreset}
-              uploadedImage={state.uploadedImage}
-              paperAge={state.paperAge}
-              paperColor={state.paperColor}
-              printStrength={state.printStrength}
-              grain={state.grain}
-              mosaicFading={state.mosaicFading}
-            />
-          )
-        ) : (
-          <div className="flex items-center justify-center h-full bg-white">
-            <div className="text-center max-w-md px-8">
-              <h2 className="text-xl font-medium text-gray-900 mb-2">
-                Upload a photo to get started
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Transform any image into a realistic paper print with customizable aging,
-                wrinkles, and paper types.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="absolute bottom-14 right-8 z-50 rounded bg-white/85 px-2 py-1 text-sm text-gray-500 shadow-sm pointer-events-none">
-          Made by: Jace Lin @jacelnn
-        </div>
-      </div>
-    </main>
   </div>
 );
 }
