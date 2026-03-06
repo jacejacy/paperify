@@ -114,69 +114,75 @@ export default function Home() {
 
   const activePreset = getPreset(state.activePreset);
 
-  return (
-  <div className="flex flex-col md:flex-row h-[100dvh] w-screen bg-white overflow-hidden md:overflow-hidden">
-    {/* Preview: fixed height on mobile, full height on desktop */}
-    <main className="order-1 md:order-2 w-full md:flex-1 shrink-0 h-[60dvh] md:h-full relative">
-      {state.uploadedImage ? (
-        hasWebGL ? (
-          state.activePreset === 'magazine' ? (
-            <Magazine2D
-              preset={activePreset}
-              uploadedImage={state.uploadedImage}
-              imageAspectRatio={state.imageAspectRatio}
-              printStrength={state.printStrength}
-              glossStrength={state.magazineGlossStrength}
-              canvasRef={canvasRef}
-            />
+return (
+  <div className="flex flex-col md:flex-row h-[100dvh] w-screen bg-white overflow-hidden">
+    {/* Preview */}
+    <main className="order-1 md:order-2 w-full md:flex-1 shrink-0 h-[60dvh] md:h-full bg-white">
+      {/* Desktop: center the canvas in the available space (like your old layout) */}
+      <div className="h-full w-full md:flex md:items-center md:justify-center md:bg-white">
+        <div className="h-full w-full md:h-full md:w-full relative">
+          {state.uploadedImage ? (
+            hasWebGL ? (
+              state.activePreset === 'magazine' ? (
+                <Magazine2D
+                  preset={activePreset}
+                  uploadedImage={state.uploadedImage}
+                  imageAspectRatio={state.imageAspectRatio}
+                  printStrength={state.printStrength}
+                  glossStrength={state.magazineGlossStrength}
+                  canvasRef={canvasRef}
+                />
+              ) : (
+                <Scene
+                  preset={activePreset}
+                  uploadedImage={state.uploadedImage}
+                  imageAspectRatio={state.imageAspectRatio}
+                  paperAge={state.paperAge}
+                  wrinkles={state.wrinkles}
+                  paperColor={state.paperColor}
+                  printStrength={state.printStrength}
+                  grain={state.grain}
+                  mosaicFading={state.mosaicFading}
+                  viewMode={state.viewMode}
+                  canvasRef={canvasRef}
+                />
+              )
+            ) : (
+              <Fallback2D
+                preset={activePreset}
+                uploadedImage={state.uploadedImage}
+                paperAge={state.paperAge}
+                paperColor={state.paperColor}
+                printStrength={state.printStrength}
+                grain={state.grain}
+                mosaicFading={state.mosaicFading}
+              />
+            )
           ) : (
-            <Scene
-              preset={activePreset}
-              uploadedImage={state.uploadedImage}
-              imageAspectRatio={state.imageAspectRatio}
-              paperAge={state.paperAge}
-              wrinkles={state.wrinkles}
-              paperColor={state.paperColor}
-              printStrength={state.printStrength}
-              grain={state.grain}
-              mosaicFading={state.mosaicFading}
-              viewMode={state.viewMode}
-              canvasRef={canvasRef}
-            />
-          )
-        ) : (
-          <Fallback2D
-            preset={activePreset}
-            uploadedImage={state.uploadedImage}
-            paperAge={state.paperAge}
-            paperColor={state.paperColor}
-            printStrength={state.printStrength}
-            grain={state.grain}
-            mosaicFading={state.mosaicFading}
-          />
-        )
-      ) : (
-        <div className="flex items-center justify-center h-full bg-white">
-          <div className="text-center max-w-md px-8">
-            <h2 className="text-xl font-medium text-gray-900 mb-2">
-              Upload a photo to get started
-            </h2>
-            <p className="text-gray-500 text-sm">
-              Transform any image into a realistic paper print with customizable aging,
-              wrinkles, and paper types.
-            </p>
+            <div className="flex items-center justify-center h-full bg-white">
+              <div className="text-center max-w-md px-8">
+                <h2 className="text-xl font-medium text-gray-900 mb-2">
+                  Upload a photo to get started
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Transform any image into a realistic paper print with customizable aging,
+                  wrinkles, and paper types.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Watermark: desktop only */}
+          <div className="hidden md:block absolute bottom-14 right-8 z-50 rounded bg-white/85 px-2 py-1 text-sm text-gray-500 shadow-sm pointer-events-none">
+            Made by: Jace Lin @jacelnn
           </div>
         </div>
-      )}
-
-      {/* Watermark: desktop only */}
-      <div className="hidden md:block absolute bottom-14 right-8 z-50 rounded bg-white/85 px-2 py-1 text-sm text-gray-500 shadow-sm pointer-events-none">
-        Made by: Jace Lin @jacelnn
       </div>
     </main>
 
-    {/* Controls: ONLY scroll area on mobile; left panel scrolls on desktop */}
-    <aside className="order-2 md:order-1 w-full md:w-[360px] md:border-r border-t md:border-t-0 flex-1 min-h-0">
+    {/* Controls */}
+    <aside className="order-2 md:order-1 w-full md:w-[320px] lg:md:w-[360px] border-t md:border-t-0 md:border-r flex-1 min-h-0">
+      {/* Important: only this area scrolls on mobile; desktop panel can also scroll */}
       <div className="h-full overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
         <ControlPanel
           state={state}
