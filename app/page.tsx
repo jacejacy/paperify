@@ -1,4 +1,4 @@
-'use client';
+  'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -115,26 +115,35 @@ export default function Home() {
   const activePreset = getPreset(state.activePreset);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-white">
-      <ControlPanel
-        state={state}
-        onUpload={handleUpload}
-        onPresetChange={handlePresetChange}
-        onPaperAgeChange={(val) => setState((prev) => ({ ...prev, paperAge: val }))}
-        onWrinklesChange={(val) => setState((prev) => ({ ...prev, wrinkles: val }))}
-        onPaperColorChange={(val) => setState((prev) => ({ ...prev, paperColor: val }))}
-        onPrintStrengthChange={(val) => setState((prev) => ({ ...prev, printStrength: val }))}
-        onGrainChange={(val) => setState((prev) => ({ ...prev, grain: val }))}
-        onMosaicFadeChange={(val) => setState((prev) => ({ ...prev, mosaicFading: val }))}
-        onGlossStrengthChange={(val) =>
-          setState((prev) => ({ ...prev, magazineGlossStrength: val }))
-        }
-        onViewModeChange={(mode) => setState((prev) => ({ ...prev, viewMode: mode }))}
-        onReset={handleReset}
-        onDownloadPNG={handleDownloadPNG}
-      />
+  <div className="flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden bg-white">
+    {/* Controls */}
+    <aside className="w-full md:w-[360px] border-b md:border-b-0 md:border-r">
+      <div className="max-h-[45dvh] md:max-h-none overflow-auto">
+        <ControlPanel
+          state={state}
+          onUpload={handleUpload}
+          onPresetChange={handlePresetChange}
+          onPaperAgeChange={(val) => setState((prev) => ({ ...prev, paperAge: val }))}
+          onWrinklesChange={(val) => setState((prev) => ({ ...prev, wrinkles: val }))}
+          onPaperColorChange={(val) => setState((prev) => ({ ...prev, paperColor: val }))}
+          onPrintStrengthChange={(val) =>
+            setState((prev) => ({ ...prev, printStrength: val }))
+          }
+          onGrainChange={(val) => setState((prev) => ({ ...prev, grain: val }))}
+          onMosaicFadeChange={(val) => setState((prev) => ({ ...prev, mosaicFading: val }))}
+          onGlossStrengthChange={(val) =>
+            setState((prev) => ({ ...prev, magazineGlossStrength: val }))
+          }
+          onViewModeChange={(mode) => setState((prev) => ({ ...prev, viewMode: mode }))}
+          onReset={handleReset}
+          onDownloadPNG={handleDownloadPNG}
+        />
+      </div>
+    </aside>
 
-      <div className="flex-1 relative">
+    {/* Preview */}
+    <main className="flex-1 min-h-0">
+      <div className="h-[55dvh] md:h-full relative">
         {state.uploadedImage ? (
           hasWebGL ? (
             state.activePreset === 'magazine' ? (
@@ -185,10 +194,12 @@ export default function Home() {
             </div>
           </div>
         )}
+
         <div className="absolute bottom-14 right-8 z-50 rounded bg-white/85 px-2 py-1 text-sm text-gray-500 shadow-sm pointer-events-none">
           Made by: Jace Lin @jacelnn
         </div>
       </div>
-    </div>
-  );
+    </main>
+  </div>
+);
 }
