@@ -56,7 +56,7 @@ export default function ControlPanel({
   <h1 className="text-2xl font-bold text-gray-900">PaperPrint Studio</h1>
   <p className="text-sm text-gray-500 mt-1">
     Transform photos into realistic paper prints
-    <span className="block md:hidden text-xs text-gray-400 mt-1">
+    <span className="block md:hidden text-xs text-gray-500 mt-1">
       Made by Jace Lin @jacelnn
     </span>
   </p>
