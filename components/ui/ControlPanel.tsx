@@ -49,7 +49,7 @@ export default function ControlPanel({
   const isMagazinePreset = state.activePreset === 'magazine';
 
   return (
-  <div className="w-full md:w-80 md:h-screen bg-white md:border-r border-gray-200 md:overflow-y-auto">
+<div className="w-full md:w-80 md:h-screen bg-white md:border-r border-gray-200 md:overflow-y-auto">
       <div className="p-6 space-y-6 animate-fadeIn">
         {/* Title */}
         <div>
