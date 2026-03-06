@@ -1,5 +1,5 @@
 'use client';
-
+import { useState } from 'react';
 import { PaperState } from '@/lib/types';
 import { getPresetList } from '@/lib/presets';
 import Slider from './Slider';
@@ -47,7 +47,8 @@ export default function ControlPanel({
   };
 
   const isMagazinePreset = state.activePreset === 'magazine';
-
+const [presetOpen, setPresetOpen] = useState(false);
+const activePreset = getPresetList().find((p) => p.id === state.activePreset);
   return (
 <div className="w-full md:w-80 md:h-screen bg-white md:border-r border-gray-200 md:overflow-y-auto">
       <div className="p-6 space-y-6 animate-fadeIn">
@@ -79,13 +80,47 @@ export default function ControlPanel({
           />
         </div>
 
-        {/* Preset Picker */}
+       {/* Preset Picker */}
+<div className="space-y-3">
+  {/* Mobile: collapsed dropdown */}
+  <div className="md:hidden">
+    <button
+      type="button"
+      onClick={() => setPresetOpen((v) => !v)}
+      className="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-lg bg-white"
+    >
+      <div className="text-left">
+        <div className="text-sm font-medium text-gray-900">
+          {activePreset?.name ?? 'Paper Preset'}
+        </div>
+        <div className="text-xs text-gray-500">{activePreset?.defaults?.paperColor}</div>
+      </div>
+      <span className="text-gray-500">{presetOpen ? '▲' : '▼'}</span>
+    </button>
+
+    {presetOpen && (
+      <div className="mt-3">
         <PresetPicker
           presets={getPresetList()}
           activePreset={state.activePreset}
-          onSelect={onPresetChange}
+          onSelect={(id) => {
+            onPresetChange(id);
+            setPresetOpen(false);
+          }}
         />
+      </div>
+    )}
+  </div>
 
+  {/* Desktop: always expanded */}
+  <div className="hidden md:block">
+    <PresetPicker
+      presets={getPresetList()}
+      activePreset={state.activePreset}
+      onSelect={onPresetChange}
+    />
+  </div>
+</div>
         {/* Divider */}
         <div className="border-t border-gray-200" />
 
