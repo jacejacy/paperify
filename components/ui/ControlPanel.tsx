@@ -51,13 +51,14 @@ export default function ControlPanel({
   return (
 <div className="w-full md:w-80 md:h-screen bg-white md:border-r border-gray-200 md:overflow-y-auto">
       <div className="p-6 space-y-6 animate-fadeIn">
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">PaperPrint Studio</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Transform photos into realistic paper prints
-          </p>
-        </div>
+{/* Title */}
+<div>
+  <h1 className="text-2xl font-bold text-gray-900">PaperPrint Studio</h1>
+  <p className="text-sm text-gray-500 mt-1">
+    Transform photos into realistic paper prints
+    <span className="md:hidden"> · Made by Jace Lin @jacelnn</span>
+  </p>
+</div>
 
         {/* Upload */}
         <div>
