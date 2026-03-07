@@ -23,6 +23,8 @@ export default function Home() {
   const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const [hasWebGL, setHasWebGL] = useState(true);
+  const [desktopExportRequestId, setDesktopExportRequestId] = useState(0);
+  const [mobileExportRequestId, setMobileExportRequestId] = useState(0);
 
   const initialPreset = getPreset('a4');
   const magazineDefaults = getPreset('magazine').defaults;
@@ -108,6 +110,18 @@ export default function Home() {
   }, [defaultGlossStrength, state.activePreset, state.magazineGlossStrength]);
 
   const handleDownloadPNG = useCallback(() => {
+    const isMagazinePreset = state.activePreset === 'magazine';
+    if (hasWebGL && !isMagazinePreset) {
+      const isMobileViewport =
+        typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+      if (isMobileViewport) {
+        setMobileExportRequestId((prev) => prev + 1);
+      } else {
+        setDesktopExportRequestId((prev) => prev + 1);
+      }
+      return;
+    }
+
     const isMobileViewport =
       typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
     const canvas = isMobileViewport
@@ -115,7 +129,7 @@ export default function Home() {
       : (desktopCanvasRef.current ?? mobileCanvasRef.current);
     if (!canvas) return;
     downloadCanvasAsImage(canvas, 'paperprint-export.png');
-  }, []);
+  }, [hasWebGL, state.activePreset]);
 
   const activePreset = getPreset(state.activePreset);
 
@@ -166,6 +180,7 @@ return (
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
                 canvasRef={desktopCanvasRef}
+                exportRequestId={desktopExportRequestId}
               />
             )
           ) : (
@@ -227,6 +242,7 @@ return (
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
                 canvasRef={mobileCanvasRef}
+                exportRequestId={mobileExportRequestId}
               />
             )
           ) : (

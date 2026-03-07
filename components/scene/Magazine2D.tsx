@@ -155,8 +155,10 @@ export default function Magazine2D({
       if (!ctx) return;
 
       try {
-        const maxDim = 4096;
-        const baseImg = await loadImage(baseSrc, maxDim, maxDim);
+        const baseMaxDim = 4096;
+        const photoMaxDim = 8192;
+        const maxRenderDim = 8192;
+        const baseImg = await loadImage(baseSrc, baseMaxDim, baseMaxDim);
         if (cancelled) return;
 
         const baseW = baseImg.width;
@@ -177,7 +179,7 @@ export default function Magazine2D({
         let photoImg: HTMLImageElement | null = null;
         let photoAspect: number | null = null;
         if (uploadedImage) {
-          photoImg = await loadImage(uploadedImage, maxDim, maxDim);
+          photoImg = await loadImage(uploadedImage, photoMaxDim, photoMaxDim);
           if (cancelled) return;
           photoAspect = photoImg.width / (photoImg.height || 1);
         }
@@ -200,13 +202,29 @@ export default function Magazine2D({
           marginBottom = preset.sheet.printArea.bottom;
         }
 
+        const normLeft = marginLeft;
+        const normTop = marginTop;
+        const normWidth = Math.max(0.01, 1 - marginLeft - marginRight);
+        const normHeight = Math.max(0.01, 1 - marginTop - marginBottom);
+
         let scaledWidth = baseW;
         let scaledHeight = baseH;
         if (preset.sheet.autoFitPrintArea && photoAspect) {
-          const printableWidthNorm = 1 - marginLeft - marginRight;
-          const printableHeightNorm = 1 - marginTop - marginBottom;
           scaledWidth = baseW;
-          scaledHeight = (scaledWidth * printableWidthNorm) / (photoAspect * printableHeightNorm);
+          scaledHeight = (scaledWidth * normWidth) / (photoAspect * normHeight);
+        }
+
+        if (photoImg) {
+          const currentPrintW = scaledWidth * normWidth;
+          const currentPrintH = scaledHeight * normHeight;
+          const neededScale = Math.max(
+            photoImg.width / Math.max(1, currentPrintW),
+            photoImg.height / Math.max(1, currentPrintH)
+          );
+          const dimCapScale = maxRenderDim / Math.max(1, Math.max(scaledWidth, scaledHeight));
+          const resolutionScale = Math.min(Math.max(neededScale, 1), dimCapScale);
+          scaledWidth *= resolutionScale;
+          scaledHeight *= resolutionScale;
         }
         scaledWidth = Math.max(1, Math.round(scaledWidth));
         scaledHeight = Math.max(1, Math.round(scaledHeight));
@@ -225,15 +243,12 @@ export default function Magazine2D({
           containerRef.current.style.height = '100%';
           containerRef.current.style.maxHeight = '100%';
         }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.clearRect(0, 0, scaledWidth, scaledHeight);
         ctx.drawImage(baseImg, 0, 0, scaledWidth, scaledHeight);
 
         if (photoImg) {
-          const normLeft = marginLeft;
-          const normTop = marginTop;
-          const normWidth = 1 - marginLeft - marginRight;
-          const normHeight = 1 - marginTop - marginBottom;
-
           const printX = normLeft * scaledWidth;
           const printY = normTop * scaledHeight;
           const printW = normWidth * scaledWidth;
@@ -250,6 +265,8 @@ export default function Magazine2D({
           const offCtx = offCanvas.getContext('2d');
           if (!offCtx) return;
 
+          offCtx.imageSmoothingEnabled = true;
+          offCtx.imageSmoothingQuality = 'high';
           offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
           offCtx.drawImage(photoImg, drawX, drawY, drawW, drawH);
 

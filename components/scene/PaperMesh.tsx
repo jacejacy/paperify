@@ -1159,6 +1159,7 @@ export default function PaperMesh({
 
   return (
     <mesh
+      name="paper-mesh"
       ref={meshRef}
       material={material}
       geometry={geometry}
