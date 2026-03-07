@@ -202,7 +202,7 @@ export default function Magazine2D({
 
         let scaledWidth = baseW;
         let scaledHeight = baseH;
-        if (photoAspect) {
+        if (preset.sheet.autoFitPrintArea && photoAspect) {
           const printableWidthNorm = 1 - marginLeft - marginRight;
           const printableHeightNorm = 1 - marginTop - marginBottom;
           scaledWidth = baseW;
@@ -219,6 +219,7 @@ export default function Magazine2D({
         canvas.style.maxWidth = '100%';
         canvas.style.maxHeight = '100%';
         canvas.style.aspectRatio = `${aspectRatio}`;
+        canvas.style.display = 'block';
         if (containerRef.current) {
           containerRef.current.style.width = 'min(100%, 1200px)';
           containerRef.current.style.height = '100%';
@@ -238,19 +239,10 @@ export default function Magazine2D({
           const printW = normWidth * scaledWidth;
           const printH = normHeight * scaledHeight;
 
-          const srcAspect = photoImg.width / Math.max(1, photoImg.height);
-          const targetAspect = printW / Math.max(1, printH);
-          let drawX = printX;
-          let drawY = printY;
-          let drawW = printW;
-          let drawH = printH;
-          if (srcAspect > targetAspect) {
-            drawH = printW / srcAspect;
-            drawY = printY + (printH - drawH) * 0.5;
-          } else if (srcAspect < targetAspect) {
-            drawW = printH * srcAspect;
-            drawX = printX + (printW - drawW) * 0.5;
-          }
+          const drawX = printX;
+          const drawY = printY;
+          const drawW = printW;
+          const drawH = printH;
 
           const offCanvas = document.createElement('canvas');
           offCanvas.width = scaledWidth;

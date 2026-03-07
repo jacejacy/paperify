@@ -20,7 +20,8 @@ const Scene = dynamic(() => import('@/components/scene/Scene'), {
 });
 
 export default function Home() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
+  const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const [hasWebGL, setHasWebGL] = useState(true);
 
   const initialPreset = getPreset('a4');
@@ -107,7 +108,11 @@ export default function Home() {
   }, [defaultGlossStrength, state.activePreset, state.magazineGlossStrength]);
 
   const handleDownloadPNG = useCallback(() => {
-    const canvas = canvasRef.current;
+    const isMobileViewport =
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+    const canvas = isMobileViewport
+      ? (mobileCanvasRef.current ?? desktopCanvasRef.current)
+      : (desktopCanvasRef.current ?? mobileCanvasRef.current);
     if (!canvas) return;
     downloadCanvasAsImage(canvas, 'paperprint-export.png');
   }, []);
@@ -136,7 +141,7 @@ return (
         onDownloadPNG={handleDownloadPNG}
       />
 
-      <div className="flex-1 relative">
+     <div className="flex-1 relative h-full min-h-0">
         {state.uploadedImage ? (
           hasWebGL ? (
             state.activePreset === 'magazine' ? (
@@ -146,7 +151,7 @@ return (
                 imageAspectRatio={state.imageAspectRatio}
                 printStrength={state.printStrength}
                 glossStrength={state.magazineGlossStrength}
-                canvasRef={canvasRef}
+                canvasRef={desktopCanvasRef}
               />
             ) : (
               <Scene
@@ -160,7 +165,7 @@ return (
                 grain={state.grain}
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
-                canvasRef={canvasRef}
+                canvasRef={desktopCanvasRef}
               />
             )
           ) : (
@@ -207,7 +212,7 @@ return (
                 imageAspectRatio={state.imageAspectRatio}
                 printStrength={state.printStrength}
                 glossStrength={state.magazineGlossStrength}
-                canvasRef={canvasRef}
+                canvasRef={mobileCanvasRef}
               />
             ) : (
               <Scene
@@ -221,7 +226,7 @@ return (
                 grain={state.grain}
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
-                canvasRef={canvasRef}
+                canvasRef={mobileCanvasRef}
               />
             )
           ) : (
