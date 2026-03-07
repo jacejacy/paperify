@@ -24,7 +24,6 @@ export default function Home() {
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const [hasWebGL, setHasWebGL] = useState(true);
   const [desktopExportRequestId, setDesktopExportRequestId] = useState(0);
-  const [mobileExportRequestId, setMobileExportRequestId] = useState(0);
 
   const initialPreset = getPreset('a4');
   const magazineDefaults = getPreset('magazine').defaults;
@@ -111,19 +110,13 @@ export default function Home() {
 
   const handleDownloadPNG = useCallback(() => {
     const isMagazinePreset = state.activePreset === 'magazine';
-    if (hasWebGL && !isMagazinePreset) {
-      const isMobileViewport =
-        typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
-      if (isMobileViewport) {
-        setMobileExportRequestId((prev) => prev + 1);
-      } else {
-        setDesktopExportRequestId((prev) => prev + 1);
-      }
-      return;
-    }
-
     const isMobileViewport =
       typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+
+    if (hasWebGL && !isMagazinePreset && !isMobileViewport) {
+      setDesktopExportRequestId((prev) => prev + 1);
+      return;
+    }
     const canvas = isMobileViewport
       ? (mobileCanvasRef.current ?? desktopCanvasRef.current)
       : (desktopCanvasRef.current ?? mobileCanvasRef.current);
@@ -242,7 +235,6 @@ return (
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
                 canvasRef={mobileCanvasRef}
-                exportRequestId={mobileExportRequestId}
               />
             )
           ) : (
