@@ -148,7 +148,7 @@ export const paperPresets: Record<string, PaperPreset> = {
       paperAge: 15,
       wrinkles: 0,
       paperColor: '#faf8f3',
-      printStrength: 55,
+      printStrength: 100,
       grain: 10,
       mosaicFading: 0,
     },

@@ -25,6 +25,9 @@ export default function Home() {
   const [hasWebGL, setHasWebGL] = useState(true);
   const [desktopExportRequestId, setDesktopExportRequestId] = useState(0);
 
+  const resolvePrintStrengthDefault = (presetId: string, value: number) =>
+    presetId === 'tracing' ? 100 : value;
+
   const initialPreset = getPreset('a4');
   const magazineDefaults = getPreset('magazine').defaults;
   const defaultGlossStrength = magazineDefaults.glossStrength ?? 70;
@@ -35,7 +38,7 @@ export default function Home() {
     paperAge: initialPreset.defaults.paperAge,
     wrinkles: initialPreset.defaults.wrinkles,
     paperColor: initialPreset.defaults.paperColor,
-    printStrength: initialPreset.defaults.printStrength,
+    printStrength: resolvePrintStrengthDefault('a4', initialPreset.defaults.printStrength),
     grain: initialPreset.defaults.grain,
     mosaicFading: initialPreset.defaults.mosaicFading,
     magazineGlossStrength: defaultGlossStrength,
@@ -81,7 +84,7 @@ export default function Home() {
         paperAge: preset.defaults.paperAge,
         wrinkles: preset.defaults.wrinkles,
         paperColor: preset.defaults.paperColor,
-        printStrength: preset.defaults.printStrength,
+        printStrength: resolvePrintStrengthDefault(preset.id, preset.defaults.printStrength),
         grain: preset.defaults.grain,
         mosaicFading: preset.defaults.mosaicFading,
         magazineGlossStrength: glossDefault,
@@ -101,7 +104,7 @@ export default function Home() {
       paperAge: preset.defaults.paperAge,
       wrinkles: preset.defaults.wrinkles,
       paperColor: preset.defaults.paperColor,
-      printStrength: preset.defaults.printStrength,
+      printStrength: resolvePrintStrengthDefault(preset.id, preset.defaults.printStrength),
       grain: preset.defaults.grain,
       mosaicFading: preset.defaults.mosaicFading,
       magazineGlossStrength: glossDefault,
