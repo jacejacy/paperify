@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { PaperState } from '@/lib/types';
 import { getPresetList } from '@/lib/presets';
+import { ExportBackgroundMode } from '@/lib/image';
 import Slider from './Slider';
 import ColorPicker from './ColorPicker';
 import PresetPicker from './PresetPicker';
@@ -20,7 +21,7 @@ interface ControlPanelProps {
   onGlossStrengthChange: (value: number) => void;
   onViewModeChange: (mode: '2d' | '3d') => void;
   onReset: () => void;
-  onDownloadPNG: () => void;
+  onDownloadPNG: (background: ExportBackgroundMode) => void;
 }
 
 export default function ControlPanel({
@@ -204,13 +205,22 @@ const activePreset = getPresetList().find((p) => p.id === state.activePreset);
           >
             Reset to Preset Defaults
           </button>
-          <button
-            onClick={onDownloadPNG}
-            disabled={!state.uploadedImage}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            Download PNG
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => onDownloadPNG('white')}
+              disabled={!state.uploadedImage}
+              className="w-full px-3 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              PNG (White)
+            </button>
+            <button
+              onClick={() => onDownloadPNG('transparent')}
+              disabled={!state.uploadedImage}
+              className="w-full px-3 py-2.5 text-sm font-medium text-gray-800 bg-white border-2 border-gray-300 rounded-lg hover:border-gray-500 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
+            >
+              PNG (Transparent)
+            </button>
+          </div>
         </div>
       </div>
     </div>

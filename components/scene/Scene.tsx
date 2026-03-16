@@ -7,7 +7,7 @@ import { Suspense, useEffect } from 'react';
 import PaperMesh from './PaperMesh';
 import { PaperPreset } from '@/lib/types';
 import * as THREE from 'three';
-import { downloadCanvasAsImage } from '@/lib/image';
+import { downloadCanvasAsImage, type ExportBackgroundMode } from '@/lib/image';
 
 interface SceneProps {
   preset: PaperPreset;
@@ -22,9 +22,16 @@ interface SceneProps {
   viewMode: '2d' | '3d';
   canvasRef?: React.RefObject<HTMLCanvasElement | null>;
   exportRequestId?: number;
+  exportBackground?: ExportBackgroundMode;
 }
 
-function HighResExporter({ exportRequestId }: { exportRequestId?: number }) {
+function HighResExporter({
+  exportRequestId,
+  exportBackground,
+}: {
+  exportRequestId?: number;
+  exportBackground?: ExportBackgroundMode;
+}) {
   const { gl, scene, camera, size } = useThree();
 
   useEffect(() => {
@@ -80,7 +87,9 @@ function HighResExporter({ exportRequestId }: { exportRequestId?: number }) {
     const exportCtx = exportCanvas.getContext('2d');
     if (exportCtx) {
       exportCtx.drawImage(gl.domElement, 0, 0, exportWidth, exportHeight);
-      downloadCanvasAsImage(exportCanvas, 'paperprint-export.png');
+      downloadCanvasAsImage(exportCanvas, 'paperprint-export.png', {
+        background: exportBackground ?? 'transparent',
+      });
     }
 
     camera.position.copy(prevPos);
@@ -91,7 +100,7 @@ function HighResExporter({ exportRequestId }: { exportRequestId?: number }) {
     gl.setPixelRatio(prevPixelRatio);
     gl.setSize(size.width, size.height, false);
     gl.render(scene, camera);
-  }, [camera, exportRequestId, gl, scene, size.height, size.width]);
+  }, [camera, exportBackground, exportRequestId, gl, scene, size.height, size.width]);
 
   return null;
 }
@@ -109,6 +118,7 @@ export default function Scene({
   viewMode,
   canvasRef,
   exportRequestId,
+  exportBackground,
 }: SceneProps) {
   return (
     <Canvas
@@ -180,7 +190,10 @@ export default function Scene({
           maxAzimuthAngle={viewMode === '3d' ? Math.PI / 3 : 0}
           target={[0, 0, 0]}
         />
-        <HighResExporter exportRequestId={exportRequestId} />
+        <HighResExporter
+          exportRequestId={exportRequestId}
+          exportBackground={exportBackground}
+        />
       </Suspense>
     </Canvas>
   );

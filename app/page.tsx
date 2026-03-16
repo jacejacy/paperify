@@ -7,7 +7,7 @@ import Fallback2D from '@/components/scene/Fallback2D';
 import Magazine2D from '@/components/scene/Magazine2D';
 import { PaperState } from '@/lib/types';
 import { getPreset } from '@/lib/presets';
-import { downloadCanvasAsImage } from '@/lib/image';
+import { downloadCanvasAsImage, type ExportBackgroundMode } from '@/lib/image';
 import { isWebGLSupported } from '@/lib/webgl';
 
 const Scene = dynamic(() => import('@/components/scene/Scene'), {
@@ -23,7 +23,13 @@ export default function Home() {
   const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const [hasWebGL, setHasWebGL] = useState(true);
-  const [desktopExportRequestId, setDesktopExportRequestId] = useState(0);
+  const [desktopExport, setDesktopExport] = useState<{
+    requestId: number;
+    background: ExportBackgroundMode;
+  }>({
+    requestId: 0,
+    background: 'transparent',
+  });
 
   const resolvePrintStrengthDefault = (presetId: string, value: number) =>
     presetId === 'tracing' ? 100 : value;
@@ -111,20 +117,23 @@ export default function Home() {
     }));
   }, [defaultGlossStrength, state.activePreset, state.magazineGlossStrength]);
 
-  const handleDownloadPNG = useCallback(() => {
+  const handleDownloadPNG = useCallback((background: ExportBackgroundMode) => {
     const isMagazinePreset = state.activePreset === 'magazine';
     const isMobileViewport =
       typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
 
     if (hasWebGL && !isMagazinePreset && !isMobileViewport) {
-      setDesktopExportRequestId((prev) => prev + 1);
+      setDesktopExport((prev) => ({
+        requestId: prev.requestId + 1,
+        background,
+      }));
       return;
     }
     const canvas = isMobileViewport
       ? (mobileCanvasRef.current ?? desktopCanvasRef.current)
       : (desktopCanvasRef.current ?? mobileCanvasRef.current);
     if (!canvas) return;
-    downloadCanvasAsImage(canvas, 'paperprint-export.png');
+    downloadCanvasAsImage(canvas, 'paperprint-export.png', { background });
   }, [hasWebGL, state.activePreset]);
 
   const activePreset = getPreset(state.activePreset);
@@ -176,7 +185,8 @@ return (
                 mosaicFading={state.mosaicFading}
                 viewMode={state.viewMode}
                 canvasRef={desktopCanvasRef}
-                exportRequestId={desktopExportRequestId}
+                exportRequestId={desktopExport.requestId}
+                exportBackground={desktopExport.background}
               />
             )
           ) : (

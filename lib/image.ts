@@ -1,5 +1,7 @@
 import { PaperPreset } from './types';
 
+export type ExportBackgroundMode = 'transparent' | 'white';
+
 export function applyPaperEffect(
   imageData: ImageData,
   preset: PaperPreset,
@@ -267,8 +269,28 @@ export function applyPaperEffect(
   return imageData;
 }
 
-export function downloadCanvasAsImage(canvas: HTMLCanvasElement, filename: string) {
-  canvas.toBlob((blob) => {
+export function downloadCanvasAsImage(
+  canvas: HTMLCanvasElement,
+  filename: string,
+  options?: { background?: ExportBackgroundMode }
+) {
+  const background = options?.background ?? 'transparent';
+  let targetCanvas: HTMLCanvasElement = canvas;
+
+  if (background === 'white') {
+    const composite = document.createElement('canvas');
+    composite.width = canvas.width;
+    composite.height = canvas.height;
+    const compositeCtx = composite.getContext('2d');
+    if (compositeCtx) {
+      compositeCtx.fillStyle = '#ffffff';
+      compositeCtx.fillRect(0, 0, composite.width, composite.height);
+      compositeCtx.drawImage(canvas, 0, 0);
+      targetCanvas = composite;
+    }
+  }
+
+  targetCanvas.toBlob((blob) => {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
